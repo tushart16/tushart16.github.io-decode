@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Easy to Decode</title>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f0f4f8; /* Light blue-gray background */
+            color: #2d3748; /* Darker text */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        .container {
+            background: linear-gradient(135deg, #ffffff 0%, #f7fafc 100%);
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            max-width: 500px;
+            width: 100%;
+            text-align: center;
+        }
+        h1 {
+            color: #38a169; /* Green header */
+            margin-bottom: 20px;
+            font-size: 1.8rem;
+            font-weight: 700;
+        }
+        p {
+            margin-bottom: 25px;
+            color: #4a5568;
+            line-height: 1.5;
+        }
+        .input-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #2d3748;
+        }
+        input[type="text"], input[type="number"] {
+            width: calc(100% - 20px);
+            padding: 10px;
+            border: 2px solid #cbd5e0; /* Light border */
+            border-radius: 8px;
+            box-sizing: border-box;
+            font-size: 1rem;
+            color: #2d3748;
+            transition: border-color 0.3s ease;
+        }
+        input[type="text"]:focus, input[type="number"]:focus {
+            outline: none;
+            border-color: #38a169; /* Green on focus */
+            box-shadow: 0 0 0 3px rgba(56, 161, 105, 0.2);
+        }
+        button {
+            width: 100%;
+            padding: 12px;
+            background-color: #38a169; /* Green button */
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1.1rem;
+            font-weight: 600;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            box-shadow: 0 4px 10px rgba(56, 161, 105, 0.3);
+        }
+        button:hover {
+            background-color: #2f855a; /* Darker green on hover */
+            transform: translateY(-2px);
+        }
+        button:active {
+            transform: translateY(0);
+        }
+        #result, #error {
+            margin-top: 25px;
+            padding: 15px;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            animation: fadeIn 0.5s ease-out;
+        }
+        #result {
+            background-color: #ecfdf5; /* Very light green */
+            color: #2f855a; /* Dark green text */
+            border: 1px solid #a7f3d0;
+        }
+        #error {
+            background-color: #fff5f5; /* Very light red */
+            color: #c53030; /* Dark red text */
+            border: 1px solid #fbd38d;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 600px) {
+            body {
+                padding: 15px;
+            }
+            .container {
+                padding: 20px;
+            }
+            h1 {
+                font-size: 1.5rem;
+            }
+            button {
+                font-size: 1rem;
+            }
+        }
+    </style>
+    <!-- Inter Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+<div class="container">
+    <h1>Easy to Decode</h1>
+    <p>Enter a positive integer 'n', then two distinct sequences of numbers from 1 to 'n' (e.g., for n=3: 1, 2, 3).</p>
+    
+    <div class="input-group">
+        <label for="inputN">Value for 'n' (positive integer):</label>
+        <input type="number" id="inputN" placeholder="e.g., 3" min="1" step="1">
+    </div>
+
+    <div class="input-group">
+        <label for="sequence1">Sequence 1 (separated by commas):</label>
+        <input type="text" id="sequence1" placeholder="e.g., 1, 2, 3">
+    </div>
+    
+    <div class="input-group">
+        <label for="sequence2">Sequence 2 (separated by commas):</label>
+        <input type="text" id="sequence2" placeholder="e.g., 3, 1, 2">
+    </div>
+    
+    <button onclick="compareSequences()">Answer</button>
+    
+    <div id="result"></div>
+    <div id="error"></div>
+</div>
+
+<script>
+    function compareSequences() {
+        const nInput = document.getElementById('inputN').value;
+        const seq1Input = document.getElementById('sequence1').value;
+        const seq2Input = document.getElementById('sequence2').value;
+        const resultDiv = document.getElementById('result');
+        const errorDiv = document.getElementById('error');
+        
+        resultDiv.textContent = ''; // Clear previous results
+        errorDiv.textContent = '';   // Clear previous errors
+
+        try {
+            const n = parseInt(nInput);
+
+            // --- Validate n ---
+            if (isNaN(n) || n < 1 || !Number.isInteger(n)) {
+                throw new Error("Please enter a valid positive integer for 'n'.");
+            }
+
+            // Parse inputs, convert to numbers, and filter out empty strings
+            const s1 = seq1Input.split(',').map(s => s.trim()).filter(s => s).map(Number);
+            const s2 = seq2Input.split(',').map(s => s.trim()).filter(s => s).map(Number);
+            
+            // --- Input Validation based on n ---
+            if (s1.length === 0 || s2.length === 0) {
+                throw new Error("Both sequence fields cannot be empty.");
+            }
+            if (s1.length !== n || s2.length !== n) {
+                throw new Error(`Both sequences must contain exactly ${n} elements as specified by 'n'.`);
+            }
+            if (s1.some(isNaN) || s2.some(isNaN)) {
+                throw new Error("All elements in sequences must be valid numbers.");
+            }
+
+            // Check for distinct elements and values from 1 to n
+            const expectedElements = new Set();
+            for (let i = 1; i <= n; i++) {
+                expectedElements.add(i);
+            }
+
+            const validateSequence = (sequence, name) => {
+                if (new Set(sequence).size !== sequence.length) {
+                    throw new Error(`${name} must contain distinct (unique) elements.`);
+                }
+                const sequenceSet = new Set(sequence);
+                if (sequenceSet.size !== n || ![...sequenceSet].every(val => expectedElements.has(val))) {
+                    throw new Error(`${name} must be a sequence of numbers from 1 to ${n}.`);
+                }
+            };
+
+            validateSequence(s1, "Sequence 1");
+            validateSequence(s2, "Sequence 2");
+
+            // --- Calculation Logic (focused on relative ordering) ---
+            // Create a map to quickly look up the "reference" position of each number from Sequence 2
+            const s2OrderMap = new Map();
+            s2.forEach((val, index) => {
+                s2OrderMap.set(val, index);
+            });
+
+            let relativeOrderMismatchCount = 0; // This will count how many pairs are "out of order" relative to s2
+            
+            // Iterate through Sequence 1
+            for (let i = 0; i < s1.length; i++) {
+                for (let j = i + 1; j < s1.length; j++) {
+                    const elementA = s1[i];
+                    const elementB = s1[j];
+
+                    // Get the positions of these two elements in the reference ordering (Sequence 2)
+                    const orderA = s2OrderMap.get(elementA);
+                    const orderB = s2OrderMap.get(elementB);
+                    
+                    // If elementA appears AFTER elementB in the reference order (s2),
+                    // but elementA appears BEFORE elementB in the current sequence (s1),
+                    // then this pair is considered "out of order" relative to the reference.
+                    if (orderA > orderB) {
+                        relativeOrderMismatchCount++;
+                    }
+                }
+            }
+
+            resultDiv.textContent = `The relative order mismatch count based on Sequence 2's ordering is: ${relativeOrderMismatchCount}`;
+
+        } catch (e) {
+            errorDiv.textContent = `Error: ${e.message}`;
+        }
+    }
+</script>
+
+</body>
+</html>
