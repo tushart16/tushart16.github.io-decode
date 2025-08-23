@@ -177,9 +177,6 @@
             if (s1.length === 0 || s2.length === 0) {
                 throw new Error("Both sequence fields cannot be empty.");
             }
-            if (s1.length !== n || s2.length !== n) {
-                throw new Error(`Both sequences must contain exactly ${n} elements as specified by 'n'.`);
-            }
             if (s1.some(isNaN) || s2.some(isNaN)) {
                 throw new Error("All elements in sequences must be valid numbers.");
             }
@@ -190,18 +187,29 @@
                 expectedElements.add(i);
             }
 
-            const validateSequence = (sequence, name) => {
-                if (new Set(sequence).size !== sequence.length) {
-                    throw new Error(`${name} must contain distinct (unique) elements.`);
+            const isPermutationOfN = (sequence) => {
+                if (new Set(sequence).size !== sequence.length) { // Check for uniqueness
+                    return false;
                 }
+                if (sequence.length !== n) { // Check for correct length
+                    return false;
+                }
+                // Check if all elements are within 1 to n and are the expected elements
                 const sequenceSet = new Set(sequence);
-                if (sequenceSet.size !== n || ![...sequenceSet].every(val => expectedElements.has(val))) {
-                    throw new Error(`${name} must be a sequence of numbers from 1 to ${n}.`);
-                }
+                return sequenceSet.size === n && [...sequenceSet].every(val => expectedElements.has(val));
             };
 
-            validateSequence(s1, "Sequence 1");
-            validateSequence(s2, "Sequence 2");
+            const s1IsPermutation = isPermutationOfN(s1);
+            const s2IsPermutation = isPermutationOfN(s2);
+
+            if (!s1IsPermutation || !s2IsPermutation) {
+                throw new Error("April Fool"); // Not a permutation of size N
+            }
+
+            // Check if both sequences are identical
+            if (s1.every((val, index) => val === s2[index])) {
+                throw new Error("April Fool"); // Both sequences are exactly the same
+            }
 
             // --- Calculation Logic (focused on relative ordering) ---
             // Create a map to quickly look up the "reference" position of each number from Sequence 2
@@ -231,10 +239,15 @@
                 }
             }
 
-            resultDiv.textContent = `The relative order mismatch count based on Sequence 2's ordering is: ${relativeOrderMismatchCount}`;
+            // Display only the number
+            resultDiv.textContent = relativeOrderMismatchCount;
 
         } catch (e) {
-            errorDiv.textContent = `Error: ${e.message}`;
+            if (e.message === "April Fool") {
+                errorDiv.textContent = "April Fool";
+            } else {
+                errorDiv.textContent = `Error: ${e.message}`;
+            }
         }
     }
 </script>
