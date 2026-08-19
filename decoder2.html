@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LED Stick Decoder</title>
+    <title>Another Easy Decoding?</title>
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -105,7 +105,8 @@
             padding: 10px 15px;
             box-sizing: border-box;
             color: #2d6a4f;
-            font-weight: 500;
+            font-weight: 600;
+            display: none; /* Hidden by default */
         }
 
         .output-box-orange {
@@ -118,16 +119,22 @@
             box-sizing: border-box;
             color: #b05c2a;
             font-weight: 500;
+            line-height: 1.6;
+            display: none; /* Hidden by default */
+        }
+
+        .error-text {
+            color: #c53030;
         }
     </style>
 </head>
 <body>
 
     <div class="container">
-        <h1>LED Stick Decoder</h1>
+        <h1>Another Easy Decoding?</h1>
         
         <div class="instructions">
-            Enter positive integers to calculate the total number of lines in the LED display based on digit occurrences.
+            Enter positive integers to know the mystery
         </div>
 
         <div class="input-group">
@@ -135,13 +142,77 @@
             <input type="text" id="positiveIntegers" placeholder="e.g., 123456">
         </div>
 
-        <!-- The button logic is intentionally left blank per your request -->
-        <button id="answerBtn">Answer</button>
+        <!-- Added onclick event to trigger the logic -->
+        <button id="answerBtn" onclick="calculateLEDSticks()">Answer</button>
 
-        <!-- Empty output boxes ready to be populated by your future JS logic -->
         <div class="output-box-green" id="outputSum"></div>
         <div class="output-box-orange" id="outputBreakdown"></div>
     </div>
+
+    <script>
+        function calculateLEDSticks() {
+            const inputVal = document.getElementById('positiveIntegers').value.trim();
+            const outputSum = document.getElementById('outputSum');
+            const outputBreakdown = document.getElementById('outputBreakdown');
+            
+            // Reset display states and styling
+            outputSum.style.display = 'none';
+            outputBreakdown.style.display = 'none';
+            outputSum.className = 'output-box-green'; 
+            outputSum.innerHTML = '';
+            outputBreakdown.innerHTML = '';
+
+            try {
+                // Validation checks
+                if (!inputVal) {
+                    throw new Error("Input cannot be empty.");
+                }
+                
+                // Regex checks that the input contains ONLY digits
+                if (!/^\d+$/.test(inputVal)) {
+                    throw new Error("Please enter valid positive integers only.");
+                }
+
+                // LED stick values mapped to indices 0-9
+                const stickValues = [6, 2, 5, 5, 4, 5, 6, 3, 7, 6];
+                
+                // Array to store digit frequencies
+                let digitCounts = new Array(10).fill(0);
+                let totalSticks = 0;
+
+                // Count frequencies
+                for (let i = 0; i < inputVal.length; i++) {
+                    let digit = parseInt(inputVal[i], 10);
+                    digitCounts[digit]++;
+                }
+
+                // Build breakdown HTML and calculate total
+                let breakdownHTML = '<strong>Breakdown:</strong><br>';
+                
+                for (let i = 0; i < 10; i++) {
+                    if (digitCounts[i] > 0) {
+                        let valueForDigit = digitCounts[i] * stickValues[i];
+                        totalSticks += valueForDigit;
+                        breakdownHTML += `Digit ${i} appeared ${digitCounts[i]} time(s) &times; ${stickValues[i]} sticks = ${valueForDigit}<br>`;
+                    }
+                }
+
+                // Display success results
+                outputSum.innerHTML = `Total Value: ${totalSticks}`;
+                outputBreakdown.innerHTML = breakdownHTML;
+                
+                outputSum.style.display = 'block';
+                outputBreakdown.style.display = 'block';
+
+            } catch (e) {
+                // Display error in the green box but style it red for failure
+                outputSum.innerHTML = `<span class="error-text">Error: ${e.message}</span>`;
+                outputSum.style.backgroundColor = "#fff5f5";
+                outputSum.style.borderColor = "#fbd38d";
+                outputSum.style.display = 'block';
+            }
+        }
+    </script>
 
 </body>
 </html>
