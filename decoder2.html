@@ -134,7 +134,7 @@
         <h1>Another Easy Decoding?</h1>
         
         <div class="instructions">
-            Enter positive integers to know the mystery
+            Enter positive integers (leading zeroes dropped) to know the mystery
         </div>
 
         <div class="input-group">
@@ -153,14 +153,14 @@
         function calculateLEDSticks() {
             const inputVal = document.getElementById('positiveIntegers').value.trim();
             const outputSum = document.getElementById('outputSum');
-            const outputBreakdown = document.getElementById('outputBreakdown');
+            // const outputBreakdown = document.getElementById('outputBreakdown');
             
             // Reset display states and styling
             outputSum.style.display = 'none';
-            outputBreakdown.style.display = 'none';
+            // outputBreakdown.style.display = 'none';
             outputSum.className = 'output-box-green'; 
             outputSum.innerHTML = '';
-            outputBreakdown.innerHTML = '';
+            // outputBreakdown.innerHTML = '';
 
             try {
                 // Validation checks
@@ -176,33 +176,37 @@
                 // LED stick values mapped to indices 0-9
                 const stickValues = [6, 2, 5, 5, 4, 5, 6, 3, 7, 6];
                 
-                // Array to store digit frequencies
+                // Array to store running digit frequencies
                 let digitCounts = new Array(10).fill(0);
                 let totalSticks = 0;
+                let leadingZ = 1;
 
-                // Count frequencies
+                // NEW LOGIC: Calculate based on prefix occurrences
                 for (let i = 0; i < inputVal.length; i++) {
                     let digit = parseInt(inputVal[i], 10);
-                    digitCounts[digit]++;
-                }
 
-                // Build breakdown HTML and calculate total
-                let breakdownHTML = '<strong>Breakdown:</strong><br>';
-                
-                for (let i = 0; i < 10; i++) {
-                    if (digitCounts[i] > 0) {
-                        let valueForDigit = digitCounts[i] * stickValues[i];
-                        totalSticks += valueForDigit;
-                        breakdownHTML += `Digit ${i} appeared ${digitCounts[i]} time(s) &times; ${stickValues[i]} sticks = ${valueForDigit}<br>`;
+                    if(leadingZ == 1 && digit == 0)
+                    {
+                        continue;
                     }
+                    else
+                    {
+                        leadingZ = 0;
+                    }
+                    
+                    // Increment the count for this digit in the current prefix
+                    digitCounts[digit]++;
+                    
+                    // Multiply the current prefix count by the digit's value and add to total
+                    totalSticks += digitCounts[digit] * stickValues[digit];
                 }
 
                 // Display success results
-                outputSum.innerHTML = `Total Value: ${totalSticks}`;
-                outputBreakdown.innerHTML = breakdownHTML;
+                outputSum.innerHTML = `${totalSticks}`;
+                // outputBreakdown.innerHTML = breakdownHTML;
                 
                 outputSum.style.display = 'block';
-                outputBreakdown.style.display = 'block';
+                // outputBreakdown.style.display = 'block';
 
             } catch (e) {
                 // Display error in the green box but style it red for failure
